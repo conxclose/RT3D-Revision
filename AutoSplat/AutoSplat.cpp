@@ -654,6 +654,33 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 {
 	// TO DO: Implement this function (see slides)
 
+	for (int x = 0; x < 32; x++)
+	{
+		for (int y = 0; y < 32; y++)
+		{
+			Color color = GetPixel(sourcex + x, sourcey + y);
+			switch (rot)
+			{
+			//normal rotation
+			case 0:
+				SetBufferPixel(destx + x, desty + y, color);
+				break;
+			//Flip in X using 32 -x
+			case 1:
+				SetBufferPixel(destx + (32-x), desty + y, color);
+				break;
+			//Rotate 180 degrees
+			case 4:
+				SetBufferPixel(destx + (32 - x), desty + (32-y), color);
+				break;
+			//Flip in Y using 32 - y
+			case 5:
+				SetBufferPixel(destx + x, desty + (32-y), color);
+				break;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -668,6 +695,39 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 	// TO DO: Implement this function (see slides)
 	// Note the code below should copy the TIM at index "tileIndex" to the map grid square "mapIndex" 
 	// CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), _MAPXPOS(mapIndex), _MAPYPOS(mapIndex), tileRot);
+
+	for (int segmentY= 0; segmentY < 16; segmentY++)
+	{
+		for (int segmentX = 0; segmentX < 16; segmentX++)
+		{
+			// 16 x 16 segment index
+			int segmentIndex = (segmentY * 16) + segmentX;
+
+			//Accessing the pointer to store the segment index within the Segment struct
+			SEGMENT* segment = &pSegments[segmentIndex];
+
+			for (int polyRow = 0; polyRow < 4; polyRow++)
+			{
+				for (int polyColumn = 0; polyColumn < 4; polyColumn++)
+				{
+					//4 x 4 polystruct index (0-255)
+					int polystructIndex = (polyRow * 4) + polyColumn;
+					//Mapping x from 0 to 64 using how many columns are left
+					int mapXIndex = (segmentX * 4) + polyColumn;
+					//Mapping y from 0 to 64 using how many rows are left
+					int mapYIndex = (segmentY * 4) + polyRow;
+					//Creating map index through x and y multiplied by 64 to give the full grid
+					int mapIndex = mapXIndex + (mapYIndex * 64);
+
+					//Using the Segment pointer to get the tile rotation and tile index from the struct
+					UINT8 tileRot = segment->strTilePolyStruct[polystructIndex].cRot;
+					UINT8 tileIndex = segment->strTilePolyStruct[polystructIndex].cTileRef;
+
+					CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), _MAPXPOS(mapIndex), _MAPYPOS(mapIndex), tileRot);
+				}
+			}
+		}
+	}
 
 	return 0;
 }
