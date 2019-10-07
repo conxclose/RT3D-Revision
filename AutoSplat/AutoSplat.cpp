@@ -665,17 +665,33 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 			case 0:
 				SetBufferPixel(destx + x, desty + y, color);
 				break;
-			//Flip in X using 32 -x
+			//Flip in X
 			case 1:
-				SetBufferPixel(destx + (32-x), desty + y, color);
+				SetBufferPixel(destx + (31-x), desty + y, color);
+				break;
+			//Rotate 90
+			case 2:
+				SetBufferPixel(destx + (31-y), desty + x, color);
+				break;
+			//Flip in X and Rotate 90
+			case 3:
+				SetBufferPixel(destx + (31-y), desty + (31-x), color);
 				break;
 			//Rotate 180 degrees
 			case 4:
-				SetBufferPixel(destx + (32 - x), desty + (32-y), color);
+				SetBufferPixel(destx + (31 - x), desty + (31-y), color);
 				break;
-			//Flip in Y using 32 - y
+			//Flip in Y
 			case 5:
-				SetBufferPixel(destx + x, desty + (32-y), color);
+				SetBufferPixel(destx + x, desty + (31-y), color);
+				break;
+			//Rotate 270
+			case 6:
+				SetBufferPixel(destx + y, desty + (31-x), color);
+				break;
+			//Flip in X and rotate 270
+			case 7:
+				SetBufferPixel(destx + y, desty + x, color);
 				break;
 			}
 		}
